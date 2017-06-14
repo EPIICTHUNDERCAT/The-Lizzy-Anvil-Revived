@@ -1,5 +1,5 @@
 package com.darkliz.lizzyanvil.eventhandler;
-
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -15,10 +15,10 @@ public class PlayerInteractEventHandler {
 	@SubscribeEvent
 	public void onPlayerInteract(PlayerInteractEvent event){
 		
-		EntityPlayer player = event.entityPlayer;
+		EntityPlayer player = event.getEntityPlayer();
 		Action action = event.action;
-		World world = event.world;
-		BlockPos pos = event.pos;
+		World world = event.getWorld();
+		BlockPos pos = event.getPos();
 		//EnumFacing face = event.face; // Can be null if unknown
 		
 		if(action == action.RIGHT_CLICK_BLOCK)
@@ -31,7 +31,7 @@ public class PlayerInteractEventHandler {
 				{
 					event.setCanceled(true);
 				}
-				else if(player.getHeldItem() == null)
+				else if(player.getHeldItemMainhand() == null)
 				{
 					event.setCanceled(true);
 				}

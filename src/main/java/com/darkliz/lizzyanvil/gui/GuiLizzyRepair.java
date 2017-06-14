@@ -36,7 +36,7 @@ public class GuiLizzyRepair extends GuiContainer implements ICrafting
 
     public GuiLizzyRepair(InventoryPlayer inventory, World worldIn)
     {
-        super(new ContainerLizzyRepair(inventory, worldIn, Minecraft.getMinecraft().thePlayer));
+        super(new ContainerLizzyRepair(inventory, worldIn, Minecraft.getMinecraft().player));
         this.playerInventory = inventory;
         this.anvil = (ContainerLizzyRepair)this.inventorySlots;
     }
@@ -91,7 +91,7 @@ public class GuiLizzyRepair extends GuiContainer implements ICrafting
             	s = I18n.format("container.repair.noheatsource", new Object[0]);
                 k = 16736352;
             }
-            else if (costLimit > 0 && this.anvil.maximumCost >= costLimit && !this.mc.thePlayer.capabilities.isCreativeMode)
+            else if (costLimit > 0 && this.anvil.maximumCost >= costLimit && !this.mc.player.capabilities.isCreativeMode)
             {
                 s = I18n.format("container.repair.expensive", new Object[0]);
                 k = 16736352;
@@ -224,10 +224,10 @@ public class GuiLizzyRepair extends GuiContainer implements ICrafting
     {
         if (slotInd == 0)
         {
-            this.nameField.setText(stack == null ? "" : stack.getDisplayName());
-            this.nameField.setEnabled(stack != null);
+            this.nameField.setText(stack.isEmpty() ? "" : stack.getDisplayName());
+            this.nameField.setEnabled(!stack.isEmpty());
 
-            if (stack != null)
+            if (!stack.isEmpty())
             {
                 this.renameItem();
             }

@@ -40,7 +40,7 @@ public class HasHeatPacket implements IMessage {
                 	
                 	if(ctx.side.isClient())
                 	{
-                		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+                		EntityPlayer player = Minecraft.getMinecraft().player;
                 		ContainerLizzyRepair containerrepair = (ContainerLizzyRepair) player.openContainer;
 	                	if (containerrepair instanceof ContainerLizzyRepair)
 	                    {

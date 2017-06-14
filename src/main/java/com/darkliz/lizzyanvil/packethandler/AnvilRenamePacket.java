@@ -33,7 +33,7 @@ public class AnvilRenamePacket implements IMessage {
     public static class Handler implements IMessageHandler<AnvilRenamePacket, IMessage> {
         @Override
         public IMessage onMessage(final AnvilRenamePacket message, final MessageContext ctx) {
-            IThreadListener mainThread = (WorldServer) ctx.getServerHandler().playerEntity.worldObj; // on the server (sending from client to server)
+            IThreadListener mainThread = (WorldServer) ctx.getServerHandler().playerEntity.world; // on the server (sending from client to server)
             //IThreadListener mainThread = Minecraft.getMinecraft(); // on the client (sending from server to client)
             mainThread.addScheduledTask(new Runnable() {
                 @Override

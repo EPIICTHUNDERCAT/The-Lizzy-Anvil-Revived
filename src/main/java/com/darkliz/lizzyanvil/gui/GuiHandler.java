@@ -5,7 +5,7 @@ import com.darkliz.lizzyanvil.container.ContainerLizzyRepair;
 import com.darkliz.lizzyanvil.init.LizzyAnvilBlocks;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.IGuiHandler;
 

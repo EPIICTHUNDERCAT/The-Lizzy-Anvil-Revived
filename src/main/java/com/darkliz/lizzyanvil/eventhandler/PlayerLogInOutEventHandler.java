@@ -25,7 +25,7 @@ public class PlayerLogInOutEventHandler {
 	public void onLogIn(PlayerLoggedInEvent event)
 	{
 		EntityPlayer player = event.player;
-		World world = player.worldObj;
+		World world = player.world;
 		
 		//Only run config sync if this is a dedicated server
 		if(LizzyAnvil.proxy.isServer())
@@ -48,7 +48,7 @@ public class PlayerLogInOutEventHandler {
 	@SubscribeEvent
 	public void onClientDisconnect(ClientDisconnectionFromServerEvent event)
 	{
-		if(!event.manager.isLocalChannel())//only do this if not on in SP
+		if(!event.getManager().isLocalChannel())//only do this if not on in SP
 		{
 			logger.info("Re-synchronizing player client to client configuration values for mod: " + Reference.MOD_ID);
 			Config.configSync();

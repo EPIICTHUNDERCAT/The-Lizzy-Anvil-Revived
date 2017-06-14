@@ -71,7 +71,7 @@ public final class Config {
 	public static final int breakChancePercentDefault		= 0; 	//Vanilla = 12
 	public static final int repairBonusPercentDefault		= 24; 	//Vanilla = 12
 	public static final int costLimitDefault				= 0;	//vanilla = 40
-	public static final int unenchantItemIDDefault			= Item.getIdFromItem(Items.redstone); //331
+	public static final int unenchantItemIDDefault			= Item.getIdFromItem(Items.REDSTONE); //331
 	public static final boolean heatRequiredDefault			= true;
 	
 	//Enchantment Costs					
@@ -135,7 +135,7 @@ public final class Config {
         
         //Enchantment Cost Notes
         prop = config.get(CATEGORY_NOTE, "note", "end");
-        prop.comment = "The costs below are based on the vanilla values with adjustments to make it fit"
+        prop.setComment("The costs below are based on the vanilla values with adjustments to make it fit"
         		+ "\nthis mod's repair system and my perception of actual in-game value."
         		+ "\nThey represent a fair cost system overall. But your perception of in-game value may differ."
         		+ "\nChange the costs to whatever you like, but keep the following in mind:"
@@ -144,27 +144,27 @@ public final class Config {
         		+ "\nGo to Minecraft Wiki/Enchanting for enchantment level information."
         		+ "\nHigher costs may result in limiting the amount of enchantments an item can have if the"
         		+ "\ncost limit is enabled (default is no cost limit)."
-        		+ "\n\nTo reset all values to default, simply delete this config file";
+        		+ "\n\nTo reset all values to default, simply delete this config file");
  
         //General
     	prop = config.get(CATEGORY_GENERAL, "1. Set Break Chance Percent", breakChancePercentDefault);
-        prop.comment = "Break Chance Percent (0-100)\n0 = will never break\nVanilla value: 12";
+        prop.setComment("Break Chance Percent (0-100)\n0 = will never break\nVanilla value: 12");
         breakChancePercent =  prop.getInt(breakChancePercentDefault);
         
         prop = config.get(CATEGORY_GENERAL, "2. Set Repair Bonus Percent", repairBonusPercentDefault);
-        prop.comment = "Repair Bonus Percent (0-100)\nVanilla value: 12";
+        prop.setComment("Repair Bonus Percent (0-100)\nVanilla value: 12");
         repairBonusPercent = prop.getInt(repairBonusPercentDefault);
         
         prop = config.get(CATEGORY_GENERAL, "3. Set Cost Limit", costLimitDefault);
-        prop.comment = "Cost Limit\n0 = disabled (no cost limit)\nVanilla value: 40";
+        prop.setComment("Cost Limit\n0 = disabled (no cost limit)\nVanilla value: 40");
         costLimit = prop.getInt(costLimitDefault);
         
         prop = config.get(CATEGORY_GENERAL, "4. Set Unenchant Item ID", unenchantItemIDDefault);
-        prop.comment = "Unenchant Item ID\nDefault: Redstone (331)\nsee Minecraft Wiki for IDs/Data Values (dec)";
+        prop.setComment("Unenchant Item ID\nDefault: Redstone (331)\nsee Minecraft Wiki for IDs/Data Values (dec)");
         unenchantItemID =  prop.getInt(unenchantItemIDDefault);
         
         prop = config.get(CATEGORY_GENERAL, "5. Set Heat Requirement", heatRequiredDefault);
-        prop.comment = "Heat Requirement\ntrue = heat required to work on anvil\nfalse = heat requirement disabled";
+        prop.setComment("Heat Requirement\ntrue = heat required to work on anvil\nfalse = heat requirement disabled");
         heatRequired = prop.getBoolean(heatRequiredDefault);
         
         
@@ -313,7 +313,7 @@ public final class Config {
 		
 		Property prop;
     	prop = config.get(category, key, defaultValue);
-    	if(!comment.isEmpty()) prop.comment = comment;
+    	if(!comment.isEmpty()) prop.setComment(comment);
     	return Math.max(prop.getInt(defaultValue), 1); //returns either the cost in the config file, the default if that is not an int, and 1 if that is an int lower than 1.
     }
 

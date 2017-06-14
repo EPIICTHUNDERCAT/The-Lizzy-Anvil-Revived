@@ -15,13 +15,13 @@ public class ConfigChangedEventHandler {
 	@SubscribeEvent(priority=EventPriority.NORMAL, receiveCanceled=true)
 	public void onConfigChange(OnConfigChangedEvent event)
 	{
-		if(event.modID.equals(Reference.MOD_ID))
+		if(event.getModID().equals(Reference.MOD_ID))
 		{
 			Config.config.save();
 			Config.configSync();
 			
 			//Only run the following code if a world is running and if running on a client; this should make it so the sync only runs when accessing the "mod options..." button from the pause menu
-			if(event.isWorldRunning && LizzyAnvil.proxy.isClient())
+			if(event.isWorldRunning() && LizzyAnvil.proxy.isClient())
 			{
 				Config.sendConfigSyncRequest(); //send an empty packet to the server that initiates the config sync (only initiates if it is a dedicated server)
 			}

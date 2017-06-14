@@ -5,11 +5,13 @@ import java.util.List;
 import com.darkliz.lizzyanvil.LizzyAnvil;
 
 import net.minecraft.block.BlockFalling;
+import net.minecraft.block.BlockHorizontal;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.properties.PropertyInteger;
-import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
@@ -17,8 +19,9 @@ import net.minecraft.entity.item.EntityFallingBlock;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -26,17 +29,20 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockLizzyAnvil extends BlockFalling
 {
-    public static final PropertyDirection FACING = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
-    public static final PropertyInteger DAMAGE = PropertyInteger.create("damage", 0, 2);
+	
+	 protected static final AxisAlignedBB X_AXIS_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.125D, 1.0D, 1.0D, 0.875D);
+	    protected static final AxisAlignedBB Z_AXIS_AABB = new AxisAlignedBB(0.125D, 0.0D, 0.0D, 0.875D, 1.0D, 1.0D);
+	    public static final PropertyDirection FACING = BlockHorizontal.FACING;
+	    public static final PropertyInteger DAMAGE = PropertyInteger.create("damage", 0, 2);
     
     public BlockLizzyAnvil()
     {
-        super(Material.anvil);
+        super(Material.ANVIL);
         this.setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH).withProperty(DAMAGE, Integer.valueOf(0)));
         this.setLightOpacity(0);
-        this.setCreativeTab(CreativeTabs.tabDecorations);
+        this.setCreativeTab(CreativeTabs.DECORATIONS);
         this.setHardness(5.0F);
-        this.setStepSound(soundTypeAnvil);
+        this.setSoundType(SoundType.ANVIL);
         this.setResistance(2000.0F);
         
     }
@@ -68,7 +74,7 @@ public class BlockLizzyAnvil extends BlockFalling
     public IBlockState onBlockPlaced(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer)
     {
         EnumFacing enumfacing1 = placer.getHorizontalFacing().rotateY();
-        return super.onBlockPlaced(worldIn, pos, facing, hitX, hitY, hitZ, meta, placer).withProperty(FACING, enumfacing1).withProperty(DAMAGE, Integer.valueOf(meta >> 2));
+        return onBlockPlaced(worldIn, pos, facing, hitX, hitY, hitZ, meta, placer).withProperty(FACING, enumfacing1).withProperty(DAMAGE, Integer.valueOf(meta >> 2));
     }
 
     public int damageDropped(IBlockState state)
@@ -76,18 +82,10 @@ public class BlockLizzyAnvil extends BlockFalling
         return ((Integer)state.getValue(DAMAGE)).intValue();
     }
     
-    public void setBlockBoundsBasedOnState(IBlockAccess worldIn, BlockPos pos)
+    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos)
     {
-        EnumFacing enumfacing = (EnumFacing)worldIn.getBlockState(pos).getValue(FACING);
-
-        if (enumfacing.getAxis() == EnumFacing.Axis.X)
-        {
-            this.setBlockBounds(0.0F, 0.0F, 0.125F, 1.0F, 1.0F, 0.875F);
-        }
-        else
-        {
-            this.setBlockBounds(0.125F, 0.0F, 0.0F, 0.875F, 1.0F, 1.0F);
-        }
+        EnumFacing enumfacing = (EnumFacing)state.getValue(FACING);
+        return enumfacing.getAxis() == EnumFacing.Axis.X ? X_AXIS_AABB : Z_AXIS_AABB;
     }
     
     @SideOnly(Side.CLIENT)
@@ -133,11 +131,12 @@ public class BlockLizzyAnvil extends BlockFalling
         int i = b0 | ((EnumFacing)state.getValue(FACING)).getHorizontalIndex();
         i |= ((Integer)state.getValue(DAMAGE)).intValue() << 2;
         return i;
+        
     }
 
-    protected BlockState createBlockState()
+    protected BlockStateContainer createBlockState()
     {
-    	return new BlockState(this, new IProperty[] {FACING, DAMAGE});
+    	return new BlockStateContainer(this, new IProperty[] {FACING, DAMAGE});
     }
     
     
