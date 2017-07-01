@@ -17,16 +17,18 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
+import net.minecraft.inventory.IContainerListener;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class GuiLizzyRepair extends GuiContainer {
+public class GuiLizzyRepair extends GuiContainer implements IContainerListener {
 	private static final ResourceLocation anvilResource = new ResourceLocation("textures/gui/container/anvil.png");
 	private ContainerLizzyRepair anvil;
 	private GuiTextField nameField;
@@ -41,6 +43,7 @@ public class GuiLizzyRepair extends GuiContainer {
 	/**
 	 * Adds the buttons (and other controls) to the screen in question.
 	 */
+	@Override
 	public void initGui() {
 		super.initGui();
 		Keyboard.enableRepeatEvents(true);
@@ -50,7 +53,9 @@ public class GuiLizzyRepair extends GuiContainer {
 		this.nameField.setTextColor(-1);
 		this.nameField.setDisabledTextColour(-1);
 		this.nameField.setEnableBackgroundDrawing(false);
-		this.nameField.setMaxStringLength(40);
+		this.nameField.setMaxStringLength(31);
+		this.inventorySlots.removeListener(this);
+		this.inventorySlots.addListener(this);
 
 	}
 
@@ -58,16 +63,18 @@ public class GuiLizzyRepair extends GuiContainer {
 	 * Called when the screen is unloaded. Used to disable keyboard repeat
 	 * events
 	 */
+	@Override
 	public void onGuiClosed() {
 		super.onGuiClosed();
 		Keyboard.enableRepeatEvents(false);
-		// this.inventorySlots.removeCraftingFromCrafters(this);
+		// this.inventorySlots.removeListener(this);
 	}
 
 	/**
 	 * Draw the foreground layer for the GuiContainer (everything in front of
 	 * the items). Args : mouseX, mouseY
 	 */
+	@Override
 	protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
 		GlStateManager.disableLighting();
 		GlStateManager.disableBlend();
@@ -119,6 +126,7 @@ public class GuiLizzyRepair extends GuiContainer {
 	 * the equivalent of KeyListener.keyTyped(KeyEvent e). Args : character
 	 * (character on the key), keyCode (lwjgl Keyboard key code)
 	 */
+	@Override
 	protected void keyTyped(char typedChar, int keyCode) throws IOException {
 		if (this.nameField.textboxKeyTyped(typedChar, keyCode)) {
 			this.renameItem();
@@ -145,6 +153,7 @@ public class GuiLizzyRepair extends GuiContainer {
 	/**
 	 * Called when the mouse is clicked. Args : mouseX, mouseY, clickedButton
 	 */
+	@Override
 	protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
 		super.mouseClicked(mouseX, mouseY, mouseButton);
 		this.nameField.mouseClicked(mouseX, mouseY, mouseButton);
@@ -154,6 +163,7 @@ public class GuiLizzyRepair extends GuiContainer {
 	 * Draws the screen and all the components in it. Args : mouseX, mouseY,
 	 * renderPartialTicks
 	 */
+	@Override
 	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
 		super.drawScreen(mouseX, mouseY, partialTicks);
 		GlStateManager.disableLighting();
@@ -164,6 +174,7 @@ public class GuiLizzyRepair extends GuiContainer {
 	/**
 	 * Args : renderPartialTicks, mouseX, mouseY
 	 */
+	@Override
 	protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
 		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 		this.mc.getTextureManager().bindTexture(anvilResource);
@@ -187,8 +198,10 @@ public class GuiLizzyRepair extends GuiContainer {
 	 * @param itemsList
 	 *            The items to be sent to the player.
 	 */
+
 	public void sendContainerAndContentsToPlayer(Container containerToSend, List itemsList) {
 		this.sendSlotContents(containerToSend, 0, containerToSend.getSlot(0).getStack());
+
 	}
 
 	/**
@@ -203,17 +216,20 @@ public class GuiLizzyRepair extends GuiContainer {
 	 * @param stack
 	 *            The itemstack to be updated in the selected slot.
 	 */
-	public void sendSlotContents(Container containerToSend, int slotInd, ItemStack stack) {
-		if (slotInd == 0) {
-			this.nameField.setText(stack.isEmpty() ? "" : stack.getDisplayName());
-			this.nameField.setEnabled(!stack.isEmpty());
+@Override
+	 public void sendSlotContents(Container containerToSend, int slotInd, ItemStack stack)
+	    {
+	        if (slotInd == 0)
+	        {
+	            this.nameField.setText(stack.isEmpty() ? "" : stack.getDisplayName());
+	            this.nameField.setEnabled(!stack.isEmpty());
 
-			if (!stack.isEmpty()) {
-				this.renameItem();
-			}
-		}
-	}
-
+	            if (!stack.isEmpty())
+	            {
+	                this.renameItem();
+	            }
+	        }
+	    }
 	/**
 	 * Sends two ints to the client-side Container. Used for furnace burning
 	 * time, smelting progress, brewing progress, and enchanting level. Normally
@@ -227,9 +243,16 @@ public class GuiLizzyRepair extends GuiContainer {
 	 * @param newValue
 	 *            The value the variable is to be updated with.
 	 */
+
 	public void sendProgressBarUpdate(Container containerIn, int varToUpdate, int newValue) {
 	}
 
-	public void func_175173_a(Container p_175173_1_, IInventory p_175173_2_) {
+	public void sendAllWindowProperties(Container containerIn, IInventory inventory) {
 	}
+
+	@Override
+	public void updateCraftingInventory(Container containerToSend, NonNullList<ItemStack> itemsList) {
+		this.sendSlotContents(containerToSend, 0, containerToSend.getSlot(0).getStack());
+	}
+
 }

@@ -119,14 +119,14 @@ public class AnvilMethods {
 			int yOffset, IBlockState state) {
 
 		if (block == Blocks.LAVA && yOffset <= 0) {
-			// System.out.println("Found lava at: " + heatPos);
+			 System.out.println("Found lava at: " + heatPos);
 			// determine if there is an appropriate line of sight from the anvil
 			// to the heat source
 			if (isHeatAccessible(world, anvilPos, heatPos, 1, state)) {
 				return true;
 			}
 		} else if (block == Blocks.FIRE && yOffset >= 0) {
-			// System.out.println("Found fire at: " + heatPos);
+			 System.out.println("Found fire at: " + heatPos);
 			// determine if there is an appropriate line of sight from the anvil
 			// to the heat source
 			if (isHeatAccessible(world, anvilPos, heatPos, 0, state)) {

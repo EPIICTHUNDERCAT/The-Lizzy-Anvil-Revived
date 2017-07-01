@@ -4,6 +4,8 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.darkliz.lizzyanvil.LizzyAnvil;
 import com.darkliz.lizzyanvil.blocks.BlockLizzyAnvil;
@@ -35,25 +37,24 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ContainerLizzyRepair extends Container {
-	// private static final Logger logger = LogManager.getLogger();
+	// private static final Logger LOGGER = LogManager.getLogger();
 	/** Here comes out item you merged and/or renamed. */
-	private IInventory outputSlot;
+	private final IInventory outputSlot;
 	/**
-	 * The 2 slots where you put your items in that you want to merge and/or
+	 * The 2slots where you put your items in that you want to merge and/or
 	 * rename.
 	 */
-	private IBlockState state;
-	private IInventory inputSlots;
-	private World theWorld;
-	private BlockPos selfPosition;
+	private final IInventory inputSlots;
+	private final World world;
+	private final BlockPos selfPosition;
 	/** The maximum cost of repairing/renaming in the anvil. */
 	public int maximumCost;
 	/** determined by damage of input item and stackSize of repair materials */
 	public int materialCost;
-	public String repairedItemName;
+	private String repairedItemName;
 	/** The player that has this container open. */
-	private final EntityPlayer thePlayer;
-
+	private final EntityPlayer player;
+	private IBlockState state;
 	public boolean hasHeatSource;
 	private ItemStack prevItemStackLeft;
 	private boolean initialHeatCheckDone;
@@ -82,8 +83,8 @@ public class ContainerLizzyRepair extends Container {
 
 		this.heatRequired = Config.heatRequired;
 		this.selfPosition = blockPosIn;
-		this.theWorld = worldIn;
-		this.thePlayer = player;
+		this.world = worldIn;
+		this.player = player;
 		this.addSlotToContainer(new Slot(this.inputSlots, 0, 27, 47));
 		this.addSlotToContainer(new Slot(this.inputSlots, 1, 76, 47));
 		this.addSlotToContainer(new Slot(this.outputSlot, 2, 134, 47) {
@@ -124,13 +125,13 @@ public class ContainerLizzyRepair extends Container {
 					ItemStack itemstack1 = ContainerLizzyRepair.this.inputSlots.getStackInSlot(1);
 
 					if (!itemstack1.isEmpty() && itemstack1.getRepairCost() > ContainerLizzyRepair.this.materialCost) {
-						itemstack1.stacksize -= ContainerLizzyRepair.this.materialCost;
+						itemstack1.shrink(ContainerLizzyRepair.this.materialCost);
 						ContainerLizzyRepair.this.inputSlots.setInventorySlotContents(1, itemstack1);
 					} else {
-						ContainerLizzyRepair.this.inputSlots.setInventorySlotContents(1, (ItemStack) null);
+						ContainerLizzyRepair.this.inputSlots.setInventorySlotContents(1, ItemStack.EMPTY);
 					}
 				} else {
-					ContainerLizzyRepair.this.inputSlots.setInventorySlotContents(1, (ItemStack) null);
+					ContainerLizzyRepair.this.inputSlots.setInventorySlotContents(1, ItemStack.EMPTY);
 				}
 
 				ContainerLizzyRepair.this.maximumCost = 0;
@@ -173,19 +174,20 @@ public class ContainerLizzyRepair extends Container {
 	/**
 	 * Callback for when the crafting matrix is changed.
 	 */
+	@Override
 	public void onCraftMatrixChanged(IInventory inventoryIn) {
 		super.onCraftMatrixChanged(inventoryIn);
 
 		if (inventoryIn == this.inputSlots) {
 			// If heat source is required
-			if (this.heatRequired && !this.theWorld.isRemote) {
+			if (this.heatRequired && !this.world.isRemote) {
 				// check for heat source whenever something is inserted into the
 				// left slot
 				ItemStack itemStackLeft = this.inputSlots.getStackInSlot(0);
 				ItemStack itemStackRight = this.inputSlots.getStackInSlot(1);
-				if (itemStackLeft != null) {
-					if (itemStackLeft.isItemStackDamageable()
-							&& !ItemStack.areItemStacksEqual(itemStackLeft, prevItemStackLeft)) {
+				if (!itemStackLeft.isEmpty()) {
+					if (itemStackLeft.isItemStackDamageable()){
+							//&& !ItemStack.areItemStacksEqual(itemStackLeft, prevItemStackLeft)) {
 						this.checkForHeatSource();
 						this.prevItemStackLeft = itemStackLeft;
 						this.initialHeatCheckDone = true;
@@ -196,7 +198,7 @@ public class ContainerLizzyRepair extends Container {
 				// up a minor display sync glitch that happens when the right
 				// slot is filled before the left one: flashes "No Heat
 				// Source!")
-				else if (itemStackRight != null && !this.initialHeatCheckDone) {
+				else if (!itemStackRight.isEmpty() && !this.initialHeatCheckDone) {
 					this.checkForHeatSource();
 					this.initialHeatCheckDone = true;
 				}
@@ -217,8 +219,9 @@ public class ContainerLizzyRepair extends Container {
 		int baseCost = 0;
 		int baseValue = 0;
 
-		if (itemstack == null) {
-			this.outputSlot.setInventorySlotContents(0, (ItemStack) null);
+		if (itemstack.isEmpty()) {
+			this.outputSlot.setInventorySlotContents(0, ItemStack.EMPTY);
+			 this.maximumCost = 0;
 		} else {
 			ItemStack itemstack1 = itemstack.copy();
 			ItemStack itemstack2 = this.inputSlots.getStackInSlot(1);
@@ -227,12 +230,12 @@ public class ContainerLizzyRepair extends Container {
 			this.materialCost = 0;
 			int j, k, l;
 
-			if (itemstack2 == null) // make the output null unless changes to
-									// the name have been made
+			if (itemstack2.isEmpty()) // make the output null unless changes to
+										// the name have been made
 			{
 				if (repairedItemName.equals(itemstack1.getDisplayName())
 						|| (StringUtils.isBlank(repairedItemName) && !itemstack1.hasDisplayName())) {
-					this.outputSlot.setInventorySlotContents(0, (ItemStack) null);
+					this.outputSlot.setInventorySlotContents(0, ItemStack.EMPTY);
 					return;
 				}
 				this.renamingOnly = true;
@@ -268,7 +271,7 @@ public class ContainerLizzyRepair extends Container {
 				{
 					// System.out.println("-------------------EXITING
 					// (0)-----------------------"); //Debug Message
-					this.outputSlot.setInventorySlotContents(0, (ItemStack) null);
+					this.outputSlot.setInventorySlotContents(0, ItemStack.EMPTY);
 					this.maximumCost = 1; // this tells the gui to check if it
 											// should display the "No Heat
 											// Source!" message if no heat
@@ -341,7 +344,7 @@ public class ContainerLizzyRepair extends Container {
 					if (j <= 0) // if there is nothing to repair, output = null
 								// and return
 					{
-						this.outputSlot.setInventorySlotContents(0, (ItemStack) null);
+						this.outputSlot.setInventorySlotContents(0, ItemStack.EMPTY);
 						return;
 					}
 					for (k = 0; j > 0 && k < itemstack2.getMaxStackSize(); ++k) // if
@@ -372,7 +375,7 @@ public class ContainerLizzyRepair extends Container {
 							&& itemstack2.getItem() != unenchantItem && itemstack2.getItem() != Items.BOOK) {
 						// System.out.println("-------------------EXITING
 						// (1)-----------------------"); //Debug Message
-						this.outputSlot.setInventorySlotContents(0, (ItemStack) null);
+						this.outputSlot.setInventorySlotContents(0, ItemStack.EMPTY);
 						return;
 					}
 					if (itemstack2.getItem() == Items.BOOK && (isBOOKInLeft || !itemstack1.isItemEnchanted())) // Only
@@ -395,7 +398,7 @@ public class ContainerLizzyRepair extends Container {
 					{
 						// System.out.println("-------------------EXITING
 						// (2)-----------------------"); //Debug Message
-						this.outputSlot.setInventorySlotContents(0, (ItemStack) null);
+						this.outputSlot.setInventorySlotContents(0, ItemStack.EMPTY);
 						return;
 					}
 					if (itemstack2.getItem() == unenchantItem && (!itemstack1.isItemEnchanted() && !isBOOKInLeft)) // Only
@@ -413,7 +416,7 @@ public class ContainerLizzyRepair extends Container {
 					{
 						// System.out.println("-------------------EXITING
 						// (3)-----------------------"); //Debug Message
-						this.outputSlot.setInventorySlotContents(0, (ItemStack) null);
+						this.outputSlot.setInventorySlotContents(0, ItemStack.EMPTY);
 						return;
 					}
 					if (!isBOOKInLeft && !itemstack1.isItemStackDamageable()) // A
@@ -435,7 +438,7 @@ public class ContainerLizzyRepair extends Container {
 					{
 						// System.out.println("-------------------EXITING
 						// (4)-----------------------"); //Debug Message
-						this.outputSlot.setInventorySlotContents(0, (ItemStack) null);
+						this.outputSlot.setInventorySlotContents(0, ItemStack.EMPTY);
 						return;
 					}
 
@@ -516,7 +519,7 @@ public class ContainerLizzyRepair extends Container {
 								} else // the custom name does not match any of
 										// the enchantments so do nothing
 								{
-									this.outputSlot.setInventorySlotContents(0, (ItemStack) null);
+									this.outputSlot.setInventorySlotContents(0, ItemStack.EMPTY);
 									return;
 								}
 							}
@@ -545,8 +548,7 @@ public class ContainerLizzyRepair extends Container {
 								// if the custom name matches an enchantment on
 								// the item
 								if (map1.containsKey(Integer.valueOf(enchantmentToTransferID))) {
-									int enchantmentLevel = ((Integer) map1
-											.get(Integer.valueOf(enchantmentToTransferID))).intValue();
+									int enchantmentLevel = ((Integer) map1.get(Integer.valueOf(enchantmentToTransferID))).intValue();
 									map1.clear(); // remove all enchantments
 									map1.put(Integer.valueOf(enchantmentToTransferID),
 											Integer.valueOf(enchantmentLevel)); // then
@@ -562,7 +564,7 @@ public class ContainerLizzyRepair extends Container {
 								} else // the custom name doesn't match any of
 										// the enchantments so do nothing
 								{
-									this.outputSlot.setInventorySlotContents(0, (ItemStack) null);
+									this.outputSlot.setInventorySlotContents(0, ItemStack.EMPTY);
 									return;
 								}
 							}
@@ -645,7 +647,7 @@ public class ContainerLizzyRepair extends Container {
 							// them
 							int enchantment1Level = map1.containsKey(Integer.valueOf(enchantment2ID))
 									? ((Integer) map1.get(Integer.valueOf(enchantment2ID))).intValue() : 0;
-							int enchantment2Level = ((Integer) map2.get(Integer.valueOf(enchantment2ID))).intValue();
+							int enchantment2Level = ( (Integer) map2.get(Integer.valueOf(enchantment2ID))).intValue();
 							int enchantmentLevelResult;
 
 							if (enchantment1Level == enchantment2Level) // if
@@ -819,7 +821,7 @@ public class ContainerLizzyRepair extends Container {
 				itemstack1.setStackDisplayName(repairedItemName);
 			}
 
-			if (itemstack2 != null) {
+			if (!itemstack2.isEmpty()) {
 				// Final Stuff
 
 				// Check BOOK compatibility (this check may be redundant at this
@@ -834,30 +836,29 @@ public class ContainerLizzyRepair extends Container {
 																														// my
 																														// own
 				{
-					itemstack1 = null;
+					itemstack1.isEmpty();
 					baseCost = 0;
-					// System.out.println("Incompatible item/BOOK combination");
+					 System.out.println("Incompatible item/BOOK combination");
 					// //Debug Message
 				}
 
 				if (nothingAdded) {
-					itemstack1 = null;
+					itemstack1.isEmpty();
 					baseCost = 0;
-					// System.out.println("Output null because nothing was added
-					// to the item"); //Debug Message
+					 System.out.println("Output null because nothing was added to the item"); //Debug Message
 				}
 
 				this.maximumCost = baseCost;
 
 				int costLimit = Config.costLimit;
 				if (costLimit > 0 && (this.maximumCost >= costLimit || baseValue >= costLimit)
-						&& !this.thePlayer.capabilities.isCreativeMode) {
-					// System.out.println("Output null due to cost limit");
+						&& !this.player.capabilities.isCreativeMode) {
+					 System.out.println("Output null due to cost limit");
 					// //Debug Message
-					itemstack1 = null;
+					itemstack1.isEmpty();
 				}
 
-				if (itemstack1 != null) {
+				if (!itemstack1.isEmpty()) {
 					EnchantmentHelper.setEnchantments(map1, itemstack1);
 				}
 			}
@@ -871,11 +872,10 @@ public class ContainerLizzyRepair extends Container {
 	 * Add the given Listener to the list of Listeners. Method name is for
 	 * legacy.
 	 **/
-	 public void addListener(IContainerListener listener)
-    {
-        super.addListener(listener);
-        listener.sendProgressBarUpdate(this, 0, this.maximumCost);
-    }
+	public void addListener(IContainerListener listener) {
+		super.addListener(listener);
+		listener.sendProgressBarUpdate(this, 0, this.maximumCost);
+	}
 
 	@SideOnly(Side.CLIENT)
 	public void updateProgressBar(int id, int data) {
@@ -891,11 +891,11 @@ public class ContainerLizzyRepair extends Container {
 	public void onContainerClosed(EntityPlayer playerIn) {
 		super.onContainerClosed(playerIn);
 
-		if (!this.theWorld.isRemote) {
+		if (!this.world.isRemote) {
 			for (int i = 0; i < this.inputSlots.getSizeInventory(); ++i) {
 				ItemStack itemstack = this.inputSlots.getStackInSlot(i);
 
-				if (itemstack != null) {
+				if (!itemstack.isEmpty()) {
 					playerIn.dropItem(itemstack, false);
 				}
 			}
@@ -903,7 +903,7 @@ public class ContainerLizzyRepair extends Container {
 	}
 
 	public boolean canInteractWith(EntityPlayer playerIn) {
-		return this.theWorld.getBlockState(this.selfPosition).getBlock() != LizzyAnvilBlocks.lizzy_anvil ? false
+		return this.world.getBlockState(this.selfPosition).getBlock() != LizzyAnvilBlocks.lizzy_anvil ? false
 				: playerIn.getDistanceSq((double) this.selfPosition.getX() + 0.5D,
 						(double) this.selfPosition.getY() + 0.5D, (double) this.selfPosition.getZ() + 0.5D) <= 64.0D;
 	}
@@ -911,9 +911,9 @@ public class ContainerLizzyRepair extends Container {
 	/**
 	 * Take a stack from the specified inventory slot.
 	 */
-
+	@Override
 	public ItemStack transferStackInSlot(EntityPlayer playerIn, int index) {
-		ItemStack itemstack = null;
+		ItemStack itemstack = ItemStack.EMPTY;
 		Slot slot = (Slot) this.inventorySlots.get(index);
 
 		if (slot != null && slot.getHasStack()) {
@@ -926,6 +926,7 @@ public class ContainerLizzyRepair extends Container {
 				}
 
 				slot.onSlotChange(itemstack1, itemstack);
+
 			} else if (index != 0 && index != 1) {
 				if (index >= 3 && index < 39 && !this.mergeItemStack(itemstack1, 0, 2, false)) {
 					return ItemStack.EMPTY;
@@ -934,8 +935,8 @@ public class ContainerLizzyRepair extends Container {
 				return ItemStack.EMPTY;
 			}
 
-			if (itemstack1.getCount() == 0) {
-				slot.putStack((ItemStack) ItemStack.EMPTY);
+			if (itemstack1.isEmpty()) {
+				slot.putStack(ItemStack.EMPTY);
 			} else {
 				slot.onSlotChanged();
 			}
@@ -971,17 +972,17 @@ public class ContainerLizzyRepair extends Container {
 	}
 
 	private void checkForHeatSource() {
-		if (!this.theWorld.isRemote) {
+		if (!this.world.isRemote) {
 			// Check for heat source; if none, repairs, etc. cannot be done
-			if (!AnvilMethods.isHeatPresent(theWorld, selfPosition, state)) {
+			if (!AnvilMethods.isHeatPresent(world, selfPosition, state)) {
 				this.hasHeatSource = false;
-				// System.out.println("No heat source");//Debug Message
+				System.out.println("No heat source");// Debug Message
 			} else {
 				this.hasHeatSource = true;
-				// System.out.println("Heat is present");//Debug Message
+				System.out.println("Heat is present");// Debug Message
 			}
-			if (thePlayer instanceof EntityPlayerMP) {
-				LizzyAnvil.network.sendTo(new HasHeatPacket(this.hasHeatSource), (EntityPlayerMP) thePlayer);
+			if (player instanceof EntityPlayerMP) {
+				LizzyAnvil.network.sendTo(new HasHeatPacket(this.hasHeatSource), (EntityPlayerMP) player);
 			}
 		}
 	}

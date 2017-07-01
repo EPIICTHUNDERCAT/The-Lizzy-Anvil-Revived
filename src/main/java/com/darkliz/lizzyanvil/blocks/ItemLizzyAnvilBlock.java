@@ -14,6 +14,7 @@ public class ItemLizzyAnvilBlock extends ItemMultiTexture
     public int getMetadata(int damage)
     {
         return damage << 2;
+        
     }
 
 }

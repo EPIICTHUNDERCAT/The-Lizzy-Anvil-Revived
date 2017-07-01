@@ -3,9 +3,9 @@ package com.darkliz.lizzyanvil.packethandler;
 import com.darkliz.lizzyanvil.config.Config;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.IThreadListener;
 import net.minecraft.world.WorldServer;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -40,7 +40,7 @@ public class RequestConfigSyncPacket implements IMessage {
                 	{
                 		//System.out.println("config sync request recieved... "); //Debug Message
 	                	
-	                	if(MinecraftServer.getServer().isDedicatedServer())
+	                	if(FMLCommonHandler.instance().getMinecraftServerInstance().isDedicatedServer())
 	                	{
 	                		//System.out.println("processing packet on server..."); //Debug Message
 	                		

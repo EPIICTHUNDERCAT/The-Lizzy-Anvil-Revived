@@ -1,5 +1,5 @@
 {
-    "parent": "mod_lizzyanvil:block/lizzy_anvil_undamaged",
+    "parent": "lizzyanvil:block/lizzy_anvil_slightly_damaged",
     "display": {
         "thirdperson": {
             "rotation": [ 10, -45, 170 ],

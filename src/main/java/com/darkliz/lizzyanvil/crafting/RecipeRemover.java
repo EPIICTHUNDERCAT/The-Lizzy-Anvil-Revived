@@ -27,7 +27,7 @@ public class RecipeRemover {
 		{	
 			ItemStack itemstack = remover.next().getRecipeOutput();
 
-			if(itemstack != null && itemstack.getItem() == item)
+			if(!itemstack.isEmpty() && itemstack.getItem() == item)
 			{
 				remover.remove();
 			}		
@@ -45,7 +45,7 @@ public class RecipeRemover {
 		{	
 			ItemStack itemstack = remover.next().getRecipeOutput();
 
-			if(itemstack != null && itemstack.getItem() == Item.getItemFromBlock(block))
+			if(!itemstack.isEmpty() && itemstack.getItem() == Item.getItemFromBlock(block))
 			{
 				remover.remove();
 			}		
