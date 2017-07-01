@@ -16,19 +16,19 @@ public static void doCraftingRecipes()
 	{
 
 	//Remove vanilla anvil recipe
-	RecipeRemover.removeCraftingRecipe(Blocks.anvil);
+	RecipeRemover.removeCraftingRecipe(Blocks.ANVIL);
 	
 	//Replace it with less expensive recipe
-	GameRegistry.addRecipe(new ItemStack(Blocks.anvil, 1), 
+	GameRegistry.addRecipe(new ItemStack(Blocks.ANVIL, 1), 
 			new Object[] {	"iii", 
 							" i ", 
-							"iii", 'I', Blocks.iron_block, 'i', Items.iron_ingot});
+							"iii", 'I', Blocks.IRON_BLOCK, 'i', Items.IRON_INGOT});
 	
 	//Add a recipe for the workshop anvil (lizzy_anvil) - requires an undamaged plain anvil (damaged plain anvils cannot be made into workshop anvils)
 	GameRegistry.addRecipe(new ItemStack(LizzyAnvilBlocks.lizzy_anvil, 1),
 			new Object[] {	"iii", 
 							"IAI", 
-							"iii", 'A', new ItemStack(Blocks.anvil, 1, 0), 'I', Blocks.iron_block, 'i', Items.iron_ingot});
+							"iii", 'A', new ItemStack(Blocks.ANVIL, 1, 0), 'I', Blocks.IRON_BLOCK, 'i', Items.IRON_INGOT});
 	
 	}
 }

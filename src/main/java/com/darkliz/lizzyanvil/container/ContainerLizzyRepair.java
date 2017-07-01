@@ -124,7 +124,7 @@ public class ContainerLizzyRepair extends Container {
 					ItemStack itemstack1 = ContainerLizzyRepair.this.inputSlots.getStackInSlot(1);
 
 					if (!itemstack1.isEmpty() && itemstack1.getRepairCost() > ContainerLizzyRepair.this.materialCost) {
-						itemstack1.stackSize -= ContainerLizzyRepair.this.materialCost;
+						itemstack1.stacksize -= ContainerLizzyRepair.this.materialCost;
 						ContainerLizzyRepair.this.inputSlots.setInventorySlotContents(1, itemstack1);
 					} else {
 						ContainerLizzyRepair.this.inputSlots.setInventorySlotContents(1, (ItemStack) null);

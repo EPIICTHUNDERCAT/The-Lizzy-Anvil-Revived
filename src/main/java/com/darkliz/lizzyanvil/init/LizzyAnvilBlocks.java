@@ -6,8 +6,8 @@ import com.darkliz.lizzyanvil.blocks.ItemLizzyAnvilBlock;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.model.ModelBakery;
-import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.client.renderer.block.model.ModelBakery;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
@@ -23,7 +23,7 @@ public class LizzyAnvilBlocks {
 		public static void init()
 		{
 			lizzy_anvil = new BlockLizzyAnvil().setUnlocalizedName("lizzy_anvil");
-			GameRegistry.registerBlock(lizzy_anvil, ItemLizzyAnvilBlock.class, lizzy_anvil.getUnlocalizedName().substring(5));
+			GameRegistry.register(lizzy_anvil, ItemLizzyAnvilBlock.class, lizzy_anvil.getUnlocalizedName().substring(5));
 			
 			
 		}
@@ -33,7 +33,7 @@ public class LizzyAnvilBlocks {
 		{
 			
 			Item item = Item.getItemFromBlock(lizzy_anvil);
-
+BlockAnvil
 			String variantName = "lizzy_anvil_intact";
 			Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(item, 0, new ModelResourceLocation(Reference.MOD_ID + ":" + variantName, "inventory"));
 			ModelBakery.addVariantName(item, Reference.MOD_ID + ":" + variantName);

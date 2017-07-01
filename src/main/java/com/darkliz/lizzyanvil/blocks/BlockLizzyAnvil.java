@@ -103,7 +103,7 @@ public class BlockLizzyAnvil extends BlockFalling
 
     public void onEndFalling(World worldIn, BlockPos pos)
     {
-        worldIn.playAuxSFX(1022, pos, 0);
+        worldIn.playEvent(1022, pos, 0);
     }
 
     @SideOnly(Side.CLIENT)
