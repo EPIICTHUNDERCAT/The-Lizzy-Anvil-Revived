@@ -4,8 +4,6 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import com.darkliz.lizzyanvil.LizzyAnvil;
 import com.darkliz.lizzyanvil.blocks.BlockLizzyAnvil;
@@ -13,7 +11,6 @@ import com.darkliz.lizzyanvil.config.Config;
 import com.darkliz.lizzyanvil.init.LizzyAnvilBlocks;
 import com.darkliz.lizzyanvil.packethandler.HasHeatPacket;
 
-import net.minecraft.block.BlockAnvil;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -31,8 +28,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.chunk.storage.AnvilSaveHandler;
-import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -213,7 +208,7 @@ public class ContainerLizzyRepair extends Container {
 	 * puts it in the output slot
 	 */
 	public void updateRepairOutput() {
-
+		  
 		ItemStack itemstack = this.inputSlots.getStackInSlot(0);
 		this.maximumCost = 0;
 		int baseCost = 0;
@@ -225,7 +220,7 @@ public class ContainerLizzyRepair extends Container {
 		} else {
 			ItemStack itemstack1 = itemstack.copy();
 			ItemStack itemstack2 = this.inputSlots.getStackInSlot(1);
-			Map map1 = EnchantmentHelper.getEnchantments(itemstack1);
+			Map<Enchantment, Integer> map1 = EnchantmentHelper.getEnchantments(itemstack1);
 			boolean isBOOKInRight = false, isBOOKInLeft = false, nothingAdded = false;
 			this.materialCost = 0;
 			int j, k, l;

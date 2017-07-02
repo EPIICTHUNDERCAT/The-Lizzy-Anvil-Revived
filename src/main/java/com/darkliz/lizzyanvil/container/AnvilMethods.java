@@ -301,24 +301,14 @@ public class AnvilMethods {
 	 * @param displayName
 	 * @return
 	 */
-	public static int getMatchingEnchantmentIDByName(Map map1, String displayName) {
-		int matchingID = -1;
-
-		Iterator iterator = map1.keySet().iterator();
-		while (iterator.hasNext()) {
-			int enchantmentID = ((Integer) iterator.next()).intValue();
-			Enchantment enchantment = Enchantment.getEnchantmentByID(enchantmentID);
-			int enchantmentLevel = ((Integer) map1.get(Integer.valueOf(enchantmentID))).intValue();
-
-			String enchantmentName = getNameWithoutNumerals(enchantment, enchantmentLevel);
-
-			// check if the display name is the same as the enchantment name,
-			// ignoring case
-			if (displayName.equalsIgnoreCase(enchantmentName)) {
-				matchingID = enchantmentID;
-			}
+	public static Enchantment getMatchingEnchantmentIDByName(Map map1, String displayName) {
+		Map<Enchantment, Integer> enchants = EnchantmentHelper.getEnchantments(stack);
+		Iterator i = enchants.entrySet().iterator();
+		Enchantment enchant;
+		while (i.hasNext()) {
+		    Map.Entry pair = (Map.Entry)i.next();
+		    enchant = (Enchantment) pair.getKey();
 		}
-		return matchingID;
 	}
 
 	/**
